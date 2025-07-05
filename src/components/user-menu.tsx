@@ -24,18 +24,25 @@ export default function UserMenu() {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex cursor-help items-center gap-2 rounded-md border border-destructive/20 bg-destructive/10 p-2 text-destructive">
+              <a
+                href="https://console.firebase.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex cursor-help items-center gap-2 rounded-md border border-destructive/20 bg-destructive/10 p-2 text-destructive transition-colors hover:bg-destructive/20"
+              >
                 <AlertTriangle className="shrink-0 size-5" />
                 <div className="flex flex-col text-left">
                   <span className="text-sm font-medium">Action Required</span>
                   <span className="text-xs">Configure Firebase</span>
                 </div>
-              </div>
+              </a>
             </TooltipTrigger>
-            <TooltipContent side="right" align="start">
-              <p>
-                Firebase credentials are missing.
-                <br /> Please add them to your .env file.
+            <TooltipContent side="right" align="start" className="max-w-xs">
+              <p className="font-semibold">Firebase credentials are missing.</p>
+              <p className="text-muted-foreground">
+                Click to open the Firebase Console, then create a new Web App in
+                your project settings to get your credentials. Copy them into
+                the `.env` file.
               </p>
             </TooltipContent>
           </Tooltip>
