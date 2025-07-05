@@ -6,4 +6,5 @@ export type Quote = {
   meaning?: string;
   origin?: string;
   trivia?: string;
+  isConfirmed?: boolean;
 };

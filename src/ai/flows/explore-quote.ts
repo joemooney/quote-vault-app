@@ -21,6 +21,7 @@ const ExploreQuoteOutputSchema = z.object({
   meaning: z.string().describe("An explanation of the quote's meaning."),
   origin: z.string().describe('The origin of the quote (when and where it was first used).'),
   trivia: z.string().describe('Interesting trivia or facts related to the quote or its author.'),
+  isConfirmed: z.boolean().describe('A boolean indicating if there is strong evidence the quote genuinely originates from the author. Be conservative; only set to true if the attribution is well-documented.'),
 });
 export type ExploreQuoteOutput = z.infer<typeof ExploreQuoteOutputSchema>;
 
@@ -33,6 +34,8 @@ const exploreQuotePrompt = ai.definePrompt({
   input: {schema: ExploreQuoteInputSchema},
   output: {schema: ExploreQuoteOutputSchema},
   prompt: `You are a literary and historical expert. Given the following quote and its author, provide a deeper exploration of its meaning, its likely origin (when and where it might have been said or written), and any interesting trivia associated with it.
+
+  Critically, you must also verify the attribution. Determine if there is strong, documented evidence that the author actually said or wrote this quote. Set the 'isConfirmed' field to true only if you have high confidence in the attribution. If the quote is commonly misattributed or its origin is disputed, set 'isConfirmed' to false.
 
   Quote: "{{{text}}}"
   Author: {{{author}}}

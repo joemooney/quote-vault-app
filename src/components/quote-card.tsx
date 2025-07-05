@@ -17,11 +17,12 @@ import {
 } from "./ui/alert-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Input } from "./ui/input";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, BadgeCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ExploreQuoteDialog from "./explore-quote-dialog";
 import { AiIcon } from "./icons";
 import type { ExploreQuoteOutput } from "@/ai/flows/explore-quote";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface QuoteCardProps {
   quote: Quote;
@@ -59,9 +60,23 @@ export default function QuoteCard({ quote, onDelete, onAddTag, onUpdateExplorati
         </blockquote>
       </CardHeader>
       <CardContent className="flex-grow">
-        <Link href={`?author=${encodeURIComponent(quote.author)}`} className="font-medium text-primary hover:underline">
-          - {quote.author}
-        </Link>
+        <div className="flex items-center gap-1.5">
+          <Link href={`?author=${encodeURIComponent(quote.author)}`} className="font-medium text-primary hover:underline">
+            - {quote.author}
+          </Link>
+          {quote.isConfirmed && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help">
+                  <BadgeCheck className="size-4 text-accent" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Verified Attribution</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
       </CardContent>
       <CardFooter className="flex flex-col items-start gap-4">
         <div className="flex flex-wrap gap-2">
