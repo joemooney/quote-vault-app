@@ -55,14 +55,14 @@ export default function QuoteCard({ quote, onDelete, onAddTag }: QuoteCardProps)
         </blockquote>
       </CardHeader>
       <CardContent className="flex-grow">
-        <Link href={`?author=${encodeURIComponent(quote.author)}`} legacyBehavior>
-          <a className="font-medium text-primary hover:underline">- {quote.author}</a>
+        <Link href={`?author=${encodeURIComponent(quote.author)}`} className="font-medium text-primary hover:underline">
+          - {quote.author}
         </Link>
       </CardContent>
       <CardFooter className="flex flex-col items-start gap-4">
         <div className="flex flex-wrap gap-2">
           {quote.tags.map((tag) => (
-            <Link href={`?tag=${encodeURIComponent(tag)}`} key={tag} legacyBehavior>
+            <Link href={`?tag=${encodeURIComponent(tag)}`} key={tag}>
               <Badge
                 variant="secondary"
                 className="cursor-pointer capitalize transition-colors hover:bg-accent hover:text-accent-foreground"

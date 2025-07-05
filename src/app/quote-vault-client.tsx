@@ -15,8 +15,8 @@ import {
   SidebarTrigger,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
   SidebarSeparator,
+  sidebarMenuButtonVariants,
 } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import AuthorList from "@/components/author-list";
@@ -26,6 +26,7 @@ import { QuoteIcon } from "@/components/icons";
 import DiscoverQuoteDialog from "@/components/discover-quote-dialog";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export default function QuoteVaultClient() {
   const router = useRouter();
@@ -99,11 +100,17 @@ export default function QuoteVaultClient() {
         <SidebarContent>
            <SidebarMenu>
             <SidebarMenuItem>
-              <Link href="/" className="w-full" legacyBehavior>
-                <SidebarMenuButton size="sm" onClick={handleClearFilters} isActive={!authorFilter && !tagFilter} className="w-full justify-start">
+                <Link
+                  href="/"
+                  onClick={handleClearFilters}
+                  data-active={!authorFilter && !tagFilter}
+                  className={cn(
+                    sidebarMenuButtonVariants({ size: "sm" }),
+                    "justify-start"
+                  )}
+                >
                    <Home className="size-4" /> All Quotes
-                </SidebarMenuButton>
-              </Link>
+                </Link>
             </SidebarMenuItem>
           </SidebarMenu>
           <SidebarSeparator />

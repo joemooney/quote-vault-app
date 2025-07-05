@@ -9,7 +9,7 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
+  sidebarMenuButtonVariants,
 } from "@/components/ui/sidebar";
 import type { Quote } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -37,14 +37,16 @@ export default function TagList({ quotes }: TagListProps) {
       <SidebarMenu>
         {tags.map((tag) => (
           <SidebarMenuItem key={tag}>
-            <Link href={`?tag=${encodeURIComponent(tag)}`} className="w-full" legacyBehavior>
-              <SidebarMenuButton
-                size="sm"
-                isActive={activeTag === tag}
-                className={cn("w-full justify-start capitalize", activeTag === tag && "font-semibold")}
-              >
-                {tag}
-              </SidebarMenuButton>
+            <Link
+              href={`?tag=${encodeURIComponent(tag)}`}
+              data-active={activeTag === tag}
+              className={cn(
+                sidebarMenuButtonVariants({ size: "sm" }),
+                "justify-start capitalize",
+                activeTag === tag && "font-semibold"
+              )}
+            >
+              {tag}
             </Link>
           </SidebarMenuItem>
         ))}

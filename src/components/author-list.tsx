@@ -9,7 +9,7 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
+  sidebarMenuButtonVariants,
 } from "@/components/ui/sidebar";
 import type { Quote } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -37,14 +37,16 @@ export default function AuthorList({ quotes }: AuthorListProps) {
       <SidebarMenu>
         {authors.map((author) => (
           <SidebarMenuItem key={author}>
-            <Link href={`?author=${encodeURIComponent(author)}`} className="w-full" legacyBehavior>
-              <SidebarMenuButton
-                size="sm"
-                isActive={activeAuthor === author}
-                className={cn("w-full justify-start", activeAuthor === author && "font-semibold")}
-              >
-                {author}
-              </SidebarMenuButton>
+            <Link
+              href={`?author=${encodeURIComponent(author)}`}
+              data-active={activeAuthor === author}
+              className={cn(
+                sidebarMenuButtonVariants({ size: "sm" }),
+                "justify-start",
+                activeAuthor === author && "font-semibold"
+              )}
+            >
+              {author}
             </Link>
           </SidebarMenuItem>
         ))}
