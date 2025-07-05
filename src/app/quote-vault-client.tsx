@@ -17,6 +17,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
   SidebarMenuButton,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import AuthorList from "@/components/author-list";
@@ -27,6 +28,7 @@ import DiscoverQuoteDialog from "@/components/discover-quote-dialog";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import type { ExploreQuoteOutput } from "@/ai/flows/explore-quote";
+import UserMenu from "@/components/user-menu";
 
 export default function QuoteVaultClient() {
   const router = useRouter();
@@ -132,6 +134,9 @@ export default function QuoteVaultClient() {
           <SidebarSeparator />
           <TagList quotes={quotes} />
         </SidebarContent>
+        <SidebarFooter>
+          <UserMenu />
+        </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <div className="p-4 sm:p-6 lg:p-8 flex-1 flex flex-col gap-6">

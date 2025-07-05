@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { quotesData } from "@/lib/data";
 import type { Quote } from "@/lib/types";
@@ -10,6 +10,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Home, BrainCircuit, CheckCircle2, XCircle, ArrowRight } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
+import { saveQuizResult } from "@/lib/firestore";
 
 // Helper to shuffle an array
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -17,6 +19,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 };
 
 export default function QuizPage() {
+  const { user } = useAuth();
   const [questions, setQuestions] = useState<Quote[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [authorOptions, setAuthorOptions] = useState<string[]>([]);
@@ -25,6 +28,7 @@ export default function QuizPage() {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [score, setScore] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
+  const quizStartTime = useRef<number | null>(null);
 
   const currentQuestion = useMemo(() => {
     return questions[currentQuestionIndex];
@@ -34,6 +38,15 @@ export default function QuizPage() {
   useEffect(() => {
     startNewQuiz();
   }, []);
+
+  // When quiz finishes, save results if user is logged in
+  useEffect(() => {
+    if (quizFinished && user && quizStartTime.current !== null) {
+      const quizEndTime = Date.now();
+      const durationInSeconds = Math.round((quizEndTime - quizStartTime.current) / 1000);
+      saveQuizResult(user.uid, score, questions.length, durationInSeconds);
+    }
+  }, [quizFinished, user, score, questions.length]);
 
   // Generate author options when the question changes
   useEffect(() => {
@@ -55,6 +68,7 @@ export default function QuizPage() {
     setCurrentQuestionIndex(0);
     setScore(0);
     setQuizFinished(false);
+    quizStartTime.current = Date.now();
   };
   
   const handleAnswerSubmit = () => {
@@ -100,7 +114,11 @@ export default function QuizPage() {
           <Card>
             <CardHeader>
               <CardTitle>Quiz Complete!</CardTitle>
-              <CardDescription>You've reached the end of the quiz.</CardDescription>
+              <CardDescription>
+                {user 
+                  ? "Your results have been saved." 
+                  : "Sign in to save your quiz history."}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-2xl text-center">Your final score is:</p>
