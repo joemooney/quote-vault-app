@@ -19,6 +19,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Input } from "./ui/input";
 import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import ExploreQuoteDialog from "./explore-quote-dialog";
+import { AiIcon } from "./icons";
 
 interface QuoteCardProps {
   quote: Quote;
@@ -62,17 +64,28 @@ export default function QuoteCard({ quote, onDelete, onAddTag }: QuoteCardProps)
       <CardFooter className="flex flex-col items-start gap-4">
         <div className="flex flex-wrap gap-2">
           {quote.tags.map((tag) => (
-            <Link href={`?tag=${encodeURIComponent(tag)}`} key={tag}>
               <Badge
+                key={tag}
                 variant="secondary"
                 className="cursor-pointer capitalize transition-colors hover:bg-accent hover:text-accent-foreground"
+                asChild
               >
-                {tag}
+                <Link href={`?tag=${encodeURIComponent(tag)}`}>{tag}</Link>
               </Badge>
-            </Link>
           ))}
         </div>
         <div className="mt-auto flex w-full items-center justify-end gap-1 self-end pt-2">
+          <ExploreQuoteDialog quote={quote}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-primary/70 hover:bg-primary/10 hover:text-primary"
+            >
+              <AiIcon className="size-5" />
+              <span className="sr-only">Explore Quote</span>
+            </Button>
+          </ExploreQuoteDialog>
+
           <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
