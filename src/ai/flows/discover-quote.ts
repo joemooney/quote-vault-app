@@ -1,9 +1,9 @@
 'use server';
 
 /**
- * @fileOverview AI flow to discover a quote on the web given a gist.
+ * @fileOverview AI flow to discover quotes on the web given a gist.
  *
- * - discoverQuote - A function that searches for a quote on the web.
+ * - discoverQuote - A function that searches for quotes on the web.
  * - DiscoverQuoteInput - The input type for the discoverQuote function.
  * - DiscoverQuoteOutput - The return type for the discoverQuote function.
  */
@@ -13,11 +13,19 @@ import {z} from 'genkit';
 
 const DiscoverQuoteInputSchema = z.object({
   quoteGist: z.string().describe('The gist of the quote to search for.'),
+  count: z.number().optional().default(5).describe('The number of quotes to find.'),
 });
 export type DiscoverQuoteInput = z.infer<typeof DiscoverQuoteInputSchema>;
 
+const DiscoveredQuoteSchema = z.object({
+  text: z.string().describe('The full text of the quote.'),
+  author: z.string().describe('The author of the quote.'),
+  tags: z.array(z.string()).describe('A list of 1-3 relevant tags for the quote.'),
+});
+export type DiscoveredQuote = z.infer<typeof DiscoveredQuoteSchema>;
+
 const DiscoverQuoteOutputSchema = z.object({
-  fullQuote: z.string().describe('The full text of the quote found on the web.'),
+  quotes: z.array(DiscoveredQuoteSchema).describe('An array of discovered quotes.'),
 });
 export type DiscoverQuoteOutput = z.infer<typeof DiscoverQuoteOutputSchema>;
 
@@ -29,11 +37,13 @@ const discoverQuotePrompt = ai.definePrompt({
   name: 'discoverQuotePrompt',
   input: {schema: DiscoverQuoteInputSchema},
   output: {schema: DiscoverQuoteOutputSchema},
-  prompt: `You are an AI assistant that helps users find the full text of a quote given a gist.
+  prompt: `You are an AI assistant that helps users find quotes based on a topic or gist.
 
-  Given the following gist of a quote, search the web and find the complete quote text. Return only the quote text and nothing else.
+  Given the following topic, search the web and find up to {{{count}}} relevant quotes. For each quote, provide the full text, the author, and a list of 1 to 3 relevant tags.
 
-  Gist: {{{quoteGist}}}`,
+  Return the result as a JSON object with a single key "quotes" which is an array of quote objects.
+
+  Topic: {{{quoteGist}}}`,
 });
 
 const discoverQuoteFlow = ai.defineFlow(
