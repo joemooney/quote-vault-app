@@ -24,7 +24,7 @@ export default function TagList({ quotes }: TagListProps) {
 
   const tags = useMemo(() => {
     const tagSet = new Set<string>();
-    quotes.forEach((quote) => quote.tags.forEach((tag) => tagSet.add(tag)));
+    quotes.forEach((quote) => quote.tags.forEach((tag) => tagSet.add(tag.toLowerCase())));
     return Array.from(tagSet).sort();
   }, [quotes]);
 

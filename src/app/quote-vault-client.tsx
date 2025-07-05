@@ -25,12 +25,14 @@ import QuoteList from "@/components/quote-list";
 import { QuoteIcon } from "@/components/icons";
 import DiscoverQuoteDialog from "@/components/discover-quote-dialog";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 export default function QuoteVaultClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [quotes, setQuotes] = useState<Quote[]>(quotesData);
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
 
   const authorFilter = searchParams.get("author");
   const tagFilter = searchParams.get("tag");
@@ -52,7 +54,7 @@ export default function QuoteVaultClient() {
 
   const handleAddQuote = (text: string, author: string, tags: string[]) => {
     const newQuote: Quote = {
-      id: quotes.length + 1,
+      id: Math.max(0, ...quotes.map(q => q.id)) + 1,
       text,
       author,
       tags,
@@ -62,6 +64,27 @@ export default function QuoteVaultClient() {
   
   const handleClearFilters = () => {
     router.push('/');
+  };
+
+  const handleDeleteQuote = (id: number) => {
+    setQuotes((prev) => prev.filter((quote) => quote.id !== id));
+    toast({
+      title: "Quote Deleted",
+      description: "The quote has been removed from your vault.",
+    });
+  };
+
+  const handleAddTagToQuote = (quoteId: number, tag: string) => {
+    setQuotes((prev) =>
+      prev.map((quote) => {
+        if (quote.id === quoteId) {
+          if (!quote.tags.includes(tag)) {
+            return { ...quote, tags: [...quote.tags, tag] };
+          }
+        }
+        return quote;
+      })
+    );
   };
 
   return (
@@ -117,7 +140,7 @@ export default function QuoteVaultClient() {
           </div>
 
           <main className="flex-1">
-            <QuoteList quotes={filteredQuotes} />
+            <QuoteList quotes={filteredQuotes} onDelete={handleDeleteQuote} onAddTag={handleAddTagToQuote} />
           </main>
         </div>
       </SidebarInset>
