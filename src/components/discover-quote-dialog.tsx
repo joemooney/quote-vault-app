@@ -22,10 +22,10 @@ import { Checkbox } from "./ui/checkbox";
 import { ScrollArea } from "./ui/scroll-area";
 
 interface DiscoverQuoteDialogProps {
-  onQuoteAdd: (text: string, author: string, tags: string[]) => void;
+  onQuotesAdd: (quotes: DiscoveredQuote[]) => void;
 }
 
-export default function DiscoverQuoteDialog({ onQuoteAdd }: DiscoverQuoteDialogProps) {
+export default function DiscoverQuoteDialog({ onQuotesAdd }: DiscoverQuoteDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [gist, setGist] = useState("");
@@ -80,18 +80,15 @@ export default function DiscoverQuoteDialog({ onQuoteAdd }: DiscoverQuoteDialogP
       return;
     }
     
-    let addedCount = 0;
-    selectedQuoteIndices.forEach(index => {
-      const quote = discoveredQuotes[index];
-      if (quote) {
-        onQuoteAdd(quote.text, quote.author, quote.tags);
-        addedCount++;
-      }
-    });
+    const quotesToAdd = Array.from(selectedQuoteIndices)
+      .map(index => discoveredQuotes[index])
+      .filter(Boolean);
+
+    onQuotesAdd(quotesToAdd);
 
     toast({
       title: "Quotes Added!",
-      description: `${addedCount} new quote(s) have been added to your vault.`,
+      description: `${quotesToAdd.length} new quote(s) have been added to your vault.`,
     });
     setIsOpen(false);
   };

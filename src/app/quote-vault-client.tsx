@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { quotesData } from "@/lib/data";
 import type { Quote } from "@/lib/types";
@@ -16,7 +16,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarSeparator,
-  sidebarMenuButtonVariants,
+  SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import AuthorList from "@/components/author-list";
@@ -26,7 +26,6 @@ import { QuoteIcon } from "@/components/icons";
 import DiscoverQuoteDialog from "@/components/discover-quote-dialog";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 
 export default function QuoteVaultClient() {
   const router = useRouter();
@@ -53,14 +52,15 @@ export default function QuoteVaultClient() {
     });
   }, [quotes, authorFilter, tagFilter, searchQuery]);
 
-  const handleAddQuote = (text: string, author: string, tags: string[]) => {
-    const newQuote: Quote = {
-      id: Math.max(0, ...quotes.map(q => q.id)) + 1,
-      text,
-      author,
-      tags,
-    };
-    setQuotes((prev) => [newQuote, ...prev]);
+  const handleAddQuotes = (newQuotes: Omit<Quote, 'id'>[]) => {
+    setQuotes((prevQuotes) => {
+      let maxId = Math.max(0, ...prevQuotes.map((q) => q.id));
+      const quotesWithIds = newQuotes.map((quote) => {
+        maxId++;
+        return { ...quote, id: maxId };
+      });
+      return [...quotesWithIds.reverse(), ...prevQuotes];
+    });
   };
   
   const handleClearFilters = () => {
@@ -100,17 +100,11 @@ export default function QuoteVaultClient() {
         <SidebarContent>
            <SidebarMenu>
             <SidebarMenuItem>
-                <Link
-                  href="/"
-                  onClick={handleClearFilters}
-                  data-active={!authorFilter && !tagFilter}
-                  className={cn(
-                    sidebarMenuButtonVariants({ size: "sm" }),
-                    "justify-start"
-                  )}
-                >
+              <Link href="/" className="w-full">
+                <SidebarMenuButton size="sm" onClick={handleClearFilters} isActive={!authorFilter && !tagFilter} className="w-full justify-start">
                    <Home className="size-4" /> All Quotes
-                </Link>
+                </SidebarMenuButton>
+              </Link>
             </SidebarMenuItem>
           </SidebarMenu>
           <SidebarSeparator />
@@ -132,7 +126,7 @@ export default function QuoteVaultClient() {
                   : "All Quotes"}
               </h2>
             </div>
-            <DiscoverQuoteDialog onQuoteAdd={handleAddQuote} />
+            <DiscoverQuoteDialog onQuotesAdd={handleAddQuotes} />
           </header>
 
           <div className="relative">
