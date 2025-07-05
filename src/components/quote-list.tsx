@@ -1,13 +1,15 @@
 import type { Quote } from "@/lib/types";
 import QuoteCard from "./quote-card";
+import type { ExploreQuoteOutput } from "@/ai/flows/explore-quote";
 
 interface QuoteListProps {
   quotes: Quote[];
   onDelete: (id: number) => void;
   onAddTag: (quoteId: number, tag: string) => void;
+  onUpdateExploration: (quoteId: number, explorationData: ExploreQuoteOutput) => void;
 }
 
-export default function QuoteList({ quotes, onDelete, onAddTag }: QuoteListProps) {
+export default function QuoteList({ quotes, onDelete, onAddTag, onUpdateExploration }: QuoteListProps) {
   if (quotes.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/20">
@@ -19,7 +21,7 @@ export default function QuoteList({ quotes, onDelete, onAddTag }: QuoteListProps
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
       {quotes.map((quote) => (
-        <QuoteCard key={quote.id} quote={quote} onDelete={onDelete} onAddTag={onAddTag} />
+        <QuoteCard key={quote.id} quote={quote} onDelete={onDelete} onAddTag={onAddTag} onUpdateExploration={onUpdateExploration} />
       ))}
     </div>
   );

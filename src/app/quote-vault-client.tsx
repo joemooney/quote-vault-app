@@ -26,6 +26,7 @@ import { QuoteIcon } from "@/components/icons";
 import DiscoverQuoteDialog from "@/components/discover-quote-dialog";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import type { ExploreQuoteOutput } from "@/ai/flows/explore-quote";
 
 export default function QuoteVaultClient() {
   const router = useRouter();
@@ -88,6 +89,16 @@ export default function QuoteVaultClient() {
     );
   };
 
+  const handleUpdateQuoteExploration = (quoteId: number, explorationData: ExploreQuoteOutput) => {
+    setQuotes(prev =>
+      prev.map(quote =>
+        quote.id === quoteId
+          ? { ...quote, ...explorationData }
+          : quote
+      )
+    );
+  };
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -100,11 +111,11 @@ export default function QuoteVaultClient() {
         <SidebarContent>
            <SidebarMenu>
             <SidebarMenuItem>
-              <Link href="/" className="w-full">
-                <SidebarMenuButton size="sm" onClick={handleClearFilters} isActive={!authorFilter && !tagFilter} className="w-full justify-start">
+                <SidebarMenuButton asChild size="sm" onClick={handleClearFilters} isActive={!authorFilter && !tagFilter} className="w-full justify-start">
+                  <Link href="/">
                    <Home className="size-4" /> All Quotes
+                  </Link>
                 </SidebarMenuButton>
-              </Link>
             </SidebarMenuItem>
           </SidebarMenu>
           <SidebarSeparator />
@@ -141,7 +152,12 @@ export default function QuoteVaultClient() {
           </div>
 
           <main className="flex-1">
-            <QuoteList quotes={filteredQuotes} onDelete={handleDeleteQuote} onAddTag={handleAddTagToQuote} />
+            <QuoteList 
+              quotes={filteredQuotes} 
+              onDelete={handleDeleteQuote} 
+              onAddTag={handleAddTagToQuote}
+              onUpdateExploration={handleUpdateQuoteExploration}
+            />
           </main>
         </div>
       </SidebarInset>

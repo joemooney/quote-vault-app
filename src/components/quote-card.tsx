@@ -21,14 +21,16 @@ import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ExploreQuoteDialog from "./explore-quote-dialog";
 import { AiIcon } from "./icons";
+import type { ExploreQuoteOutput } from "@/ai/flows/explore-quote";
 
 interface QuoteCardProps {
   quote: Quote;
   onDelete: (id: number) => void;
   onAddTag: (quoteId: number, tag: string) => void;
+  onUpdateExploration: (quoteId: number, explorationData: ExploreQuoteOutput) => void;
 }
 
-export default function QuoteCard({ quote, onDelete, onAddTag }: QuoteCardProps) {
+export default function QuoteCard({ quote, onDelete, onAddTag, onUpdateExploration }: QuoteCardProps) {
   const [newTag, setNewTag] = useState("");
   const [popoverOpen, setPopoverOpen] = useState(false);
   const { toast } = useToast();
@@ -75,7 +77,7 @@ export default function QuoteCard({ quote, onDelete, onAddTag }: QuoteCardProps)
           ))}
         </div>
         <div className="mt-auto flex w-full items-center justify-end gap-1 self-end pt-2">
-          <ExploreQuoteDialog quote={quote}>
+          <ExploreQuoteDialog quote={quote} onUpdateExploration={onUpdateExploration}>
             <Button
               variant="ghost"
               size="icon"

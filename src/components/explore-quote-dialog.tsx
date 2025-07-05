@@ -12,24 +12,26 @@ import { type ExploreQuoteOutput } from "@/ai/flows/explore-quote";
 interface ExploreQuoteDialogProps {
   quote: Quote;
   children: React.ReactNode;
+  onUpdateExploration: (quoteId: number, explorationData: ExploreQuoteOutput) => void;
 }
 
-export default function ExploreQuoteDialog({ quote, children }: ExploreQuoteDialogProps) {
+export default function ExploreQuoteDialog({ quote, children, onUpdateExploration }: ExploreQuoteDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<ExploreQuoteOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
+  const hasCachedData = !!(quote.meaning && quote.origin && quote.trivia);
+
   const handleOpenChange = async (open: boolean) => {
     setIsOpen(open);
-    if (open && !result) {
+    if (open && !hasCachedData) {
       setIsLoading(true);
       setError(null);
       const response = await handleExploreQuote(quote.text, quote.author);
       setIsLoading(false);
       if (response.success && response.data) {
-        setResult(response.data);
+        onUpdateExploration(quote.id, response.data);
       } else {
         setError(response.error ?? "An unknown error occurred.");
         toast({
@@ -40,14 +42,14 @@ export default function ExploreQuoteDialog({ quote, children }: ExploreQuoteDial
         setIsOpen(false);
       }
     } else if (!open) {
-      // Reset state when dialog is closed
       setTimeout(() => {
-        setResult(null);
         setError(null);
         setIsLoading(false);
       }, 300);
     }
   };
+
+  const explorationResult = hasCachedData ? { meaning: quote.meaning!, origin: quote.origin!, trivia: quote.trivia! } : null;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -73,19 +75,19 @@ export default function ExploreQuoteDialog({ quote, children }: ExploreQuoteDial
                 <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          {result && (
+          {explorationResult && !isLoading && (
             <div className="space-y-6">
               <div className="space-y-2">
                  <h3 className="flex items-center gap-2 text-lg font-semibold"><BrainCircuit className="size-5 text-primary"/> Meaning</h3>
-                 <p className="text-muted-foreground">{result.meaning}</p>
+                 <p className="text-muted-foreground">{explorationResult.meaning}</p>
               </div>
                <div className="space-y-2">
                  <h3 className="flex items-center gap-2 text-lg font-semibold"><History className="size-5 text-primary"/> Origin</h3>
-                 <p className="text-muted-foreground">{result.origin}</p>
+                 <p className="text-muted-foreground">{explorationResult.origin}</p>
               </div>
                <div className="space-y-2">
                  <h3 className="flex items-center gap-2 text-lg font-semibold"><BookOpen className="size-5 text-primary"/> Trivia</h3>
-                 <p className="text-muted-foreground">{result.trivia}</p>
+                 <p className="text-muted-foreground">{explorationResult.trivia}</p>
               </div>
             </div>
           )}

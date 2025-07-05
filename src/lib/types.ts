@@ -3,4 +3,7 @@ export type Quote = {
   text: string;
   author: string;
   tags: string[];
+  meaning?: string;
+  origin?: string;
+  trivia?: string;
 };
