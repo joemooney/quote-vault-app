@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { quotesData } from "@/lib/data";
 import type { Quote } from "@/lib/types";
-import { Search, Home } from "lucide-react";
+import { Search, Home, BrainCircuit } from "lucide-react";
 
 import {
   SidebarProvider,
@@ -31,12 +31,14 @@ import type { ExploreQuoteOutput } from "@/ai/flows/explore-quote";
 export default function QuoteVaultClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [quotes, setQuotes] = useState<Quote[]>(quotesData);
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
 
   const authorFilter = searchParams.get("author");
   const tagFilter = searchParams.get("tag");
+  const isQuizPage = pathname === '/quiz';
 
   const filteredQuotes = useMemo(() => {
     return quotes.filter((quote) => {
@@ -111,11 +113,18 @@ export default function QuoteVaultClient() {
         <SidebarContent>
            <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton asChild size="sm" onClick={handleClearFilters} isActive={!authorFilter && !tagFilter} className="w-full justify-start">
+                <SidebarMenuButton asChild size="sm" onClick={handleClearFilters} isActive={!authorFilter && !tagFilter && !isQuizPage} className="w-full justify-start">
                   <Link href="/">
                    <Home className="size-4" /> All Quotes
                   </Link>
                 </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild size="sm" isActive={isQuizPage} className="w-full justify-start">
+                <Link href="/quiz">
+                  <BrainCircuit className="size-4" /> Quiz
+                </Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
           <SidebarSeparator />

@@ -17,10 +17,9 @@ import {
 } from "./ui/alert-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Input } from "./ui/input";
-import { Plus, Trash2, BadgeCheck } from "lucide-react";
+import { Plus, Trash2, BadgeCheck, CircleHelp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ExploreQuoteDialog from "./explore-quote-dialog";
-import { AiIcon } from "./icons";
 import type { ExploreQuoteOutput } from "@/ai/flows/explore-quote";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
@@ -98,7 +97,7 @@ export default function QuoteCard({ quote, onDelete, onAddTag, onUpdateExplorati
               size="icon"
               className="h-8 w-8 text-primary/70 hover:bg-primary/10 hover:text-primary"
             >
-              <AiIcon className="size-5" />
+              <CircleHelp className="size-5" />
               <span className="sr-only">Explore Quote</span>
             </Button>
           </ExploreQuoteDialog>
