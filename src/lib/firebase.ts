@@ -11,27 +11,30 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Check for missing Firebase environment variables
+const requiredEnvVars = [
+  'NEXT_PUBLIC_FIREBASE_API_KEY',
+  'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
+  'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+];
+const missingEnvVars = requiredEnvVars.filter(key => !(process.env as any)[key]);
+export const firebaseCredentialsExist = missingEnvVars.length === 0;
+
+
 let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
 const googleProvider = new GoogleAuthProvider();
-
-// Check if all necessary Firebase config values are present
-export const firebaseCredentialsExist =
-  firebaseConfig.apiKey &&
-  firebaseConfig.authDomain &&
-  firebaseConfig.projectId;
 
 if (firebaseCredentialsExist) {
   app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
   auth = getAuth(app);
   db = getFirestore(app);
 } else {
-  // Provide mock/dummy objects if credentials are not set.
-  // This allows the app to run without crashing during development if Firebase is not configured.
+  // This warning will now be more specific, helping with debugging.
   if (process.env.NODE_ENV !== "production") {
     console.warn(
-      "Firebase config missing. Auth and Firestore features will be disabled. Please set up your .env file."
+      `Firebase config missing or incomplete. Auth and Firestore features will be disabled. Please set up your .env file. Missing variables: ${missingEnvVars.join(', ')}`
     );
   }
   app = {} as FirebaseApp;
