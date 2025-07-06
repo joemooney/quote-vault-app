@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import type { User } from 'firebase/auth';
 import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth';
-import { auth, googleProvider, firebaseCredentialsExist } from '@/lib/firebase';
+import { auth, googleProvider } from '@/lib/firebase';
 
 interface AuthContextType {
   user: User | null;
@@ -11,6 +11,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   isConfigured: boolean;
+  missingKeys: string[];
   isClient: boolean;
 }
 
@@ -20,23 +21,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
+  const [isConfigured, setIsConfigured] = useState(false);
+  const [missingKeys, setMissingKeys] = useState<string[]>([]);
 
   useEffect(() => {
     setIsClient(true);
-    if (firebaseCredentialsExist) {
+    
+    const requiredEnvVars = [
+      'NEXT_PUBLIC_FIREBASE_API_KEY',
+      'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
+      'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+    ];
+    const missing = requiredEnvVars.filter(key => !process.env[key]);
+    
+    if (missing.length === 0) {
+      setIsConfigured(true);
+      setMissingKeys([]);
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         setUser(user);
         setLoading(false);
       });
-
       return () => unsubscribe();
     } else {
+      setMissingKeys(missing);
+      setIsConfigured(false);
       setLoading(false);
     }
   }, []);
 
   const signInWithGoogle = async () => {
-    if (!firebaseCredentialsExist) {
+    if (!isConfigured) {
       alert("Firebase is not configured. Please add your project credentials to the .env file to enable authentication.");
       return;
     }
@@ -48,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    if (!firebaseCredentialsExist) return;
+    if (!isConfigured) return;
     try {
       await firebaseSignOut(auth);
     } catch (error) {
@@ -56,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const value = { user, loading, signInWithGoogle, signOut, isConfigured: firebaseCredentialsExist, isClient };
+  const value = { user, loading, signInWithGoogle, signOut, isConfigured, missingKeys, isClient };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

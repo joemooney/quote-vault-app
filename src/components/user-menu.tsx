@@ -16,7 +16,7 @@ import { Skeleton } from "./ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function UserMenu() {
-  const { user, loading, signInWithGoogle, signOut, isConfigured, isClient } = useAuth();
+  const { user, loading, signInWithGoogle, signOut, isConfigured, missingKeys, isClient } = useAuth();
 
   if (!isClient || loading) {
     return (
@@ -46,12 +46,18 @@ export default function UserMenu() {
               </a>
             </TooltipTrigger>
             <TooltipContent side="right" align="start" className="max-w-xs">
-              <p className="font-semibold">Firebase credentials are missing.</p>
-              <p className="text-muted-foreground">
-                Click to open the Firebase Console, then create a new Web App in
-                your project settings to get your credentials. Copy them into
-                the `.env` file.
-              </p>
+               <p className="font-semibold">Firebase Configuration Required</p>
+               {missingKeys.length > 0 ? (
+                 <div className="mt-2 space-y-2">
+                   <p className="text-muted-foreground">Your `.env` file is missing or has empty values for:</p>
+                   <div className="space-y-1 rounded-md bg-muted p-2 font-mono text-xs text-destructive">
+                     {missingKeys.map(key => <div key={key}>{key}</div>)}
+                   </div>
+                   <p className="text-muted-foreground">Click the "Action Required" card to go to the Firebase console and find these values in your web app's settings.</p>
+                 </div>
+               ) : (
+                 <p className="text-muted-foreground mt-2">Could not connect to Firebase. Please ensure your credentials in the `.env` file are correct.</p>
+               )}
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
