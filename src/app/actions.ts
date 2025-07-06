@@ -13,7 +13,8 @@ export async function handleDiscoverQuote(gist: string) {
     return { success: false, error: 'Could not find any quotes for the given topic.' };
   } catch (error) {
     console.error("Error discovering quotes:", error);
-    return { success: false, error: "Failed to discover quotes. Please try again." };
+    const message = error instanceof Error ? error.message : "Please try again.";
+    return { success: false, error: `Discovery failed: ${message}` };
   }
 }
 
@@ -24,6 +25,7 @@ export async function handleExploreQuote(text: string, author: string) {
     return { success: true, data: result };
   } catch (error) {
     console.error("Error exploring quote:", error);
-    return { success: false, error: "Failed to explore quote. Please try again." };
+    const message = error instanceof Error ? error.message : "Please try again.";
+    return { success: false, error: `Exploration failed: ${message}` };
   }
 }
