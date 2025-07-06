@@ -56,7 +56,7 @@ export default function UserMenu() {
                  <div className="space-y-1 rounded-md bg-muted p-2 font-mono text-xs text-foreground">
                     {availableKeys.length > 0 ? availableKeys.map(key => <div key={key}>{key}</div>) : <div>None found.</div>}
                  </div>
-                 <p className="text-muted-foreground">Please ensure your `.env` file is correctly formatted and contains all the necessary keys.</p>
+                 <p className="text-muted-foreground">Please ensure your `.env.local` file is correctly formatted and contains all the necessary keys.</p>
                </div>
             </TooltipContent>
           </Tooltip>
