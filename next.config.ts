@@ -51,4 +51,10 @@ const nextConfig: NextConfig = {
   },
 };
 
+// --- START DEBUG LOGS ---
+console.log('[Firebase Studio Debug] Reading next.config.ts...');
+console.log('[Firebase Studio Debug] Allowed Origins being configured:', JSON.stringify(nextConfig.allowedDevOrigins, null, 2));
+// --- END DEBUG LOGS ---
+
+
 export default nextConfig;
