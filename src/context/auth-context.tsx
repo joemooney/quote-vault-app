@@ -11,6 +11,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   isConfigured: boolean;
+  isClient: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,8 +19,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     if (firebaseCredentialsExist) {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         setUser(user);
@@ -53,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const value = { user, loading, signInWithGoogle, signOut, isConfigured: firebaseCredentialsExist };
+  const value = { user, loading, signInWithGoogle, signOut, isConfigured: firebaseCredentialsExist, isClient };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

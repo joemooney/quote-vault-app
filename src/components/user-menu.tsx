@@ -16,7 +16,15 @@ import { Skeleton } from "./ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function UserMenu() {
-  const { user, loading, signInWithGoogle, signOut, isConfigured } = useAuth();
+  const { user, loading, signInWithGoogle, signOut, isConfigured, isClient } = useAuth();
+
+  if (!isClient || loading) {
+    return (
+      <div className="p-2">
+        <Skeleton className="h-10 w-full" />
+      </div>
+    );
+  }
 
   if (!isConfigured) {
     return (
@@ -51,13 +59,6 @@ export default function UserMenu() {
     );
   }
 
-  if (loading) {
-    return (
-      <div className="p-2">
-        <Skeleton className="h-10 w-full" />
-      </div>
-    );
-  }
 
   if (!user) {
     return (
