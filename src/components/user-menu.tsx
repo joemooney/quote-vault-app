@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/auth-context";
+import { getFirebaseInstances } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,10 +15,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogIn, LogOut, AlertTriangle } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useEffect, useState } from "react";
 
 export default function UserMenu() {
-  const { user, loading, signInWithGoogle, signOut, isConfigured, missingKeys, availableKeys, isClient } = useAuth();
+  const { user, loading, signInWithGoogle, signOut } = useAuth();
+  const [isClient, setIsClient] = useState(false);
 
+  // Defer rendering until client-side to avoid hydration mismatches
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
   if (!isClient || loading) {
     return (
       <div className="p-2">
@@ -25,6 +33,9 @@ export default function UserMenu() {
       </div>
     );
   }
+  
+  // Directly get config status on the client
+  const { isConfigured, missingKeys, availableKeys } = getFirebaseInstances();
 
   if (!isConfigured) {
     return (

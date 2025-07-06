@@ -10,10 +10,6 @@ interface AuthContextType {
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
-  isConfigured: boolean;
-  missingKeys: string[];
-  availableKeys: string[];
-  isClient: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,42 +17,28 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isClient, setIsClient] = useState(false);
-  const [isConfigured, setIsConfigured] = useState(false);
-  const [missingKeys, setMissingKeys] = useState<string[]>([]);
-  const [availableKeys, setAvailableKeys] = useState<string[]>([]);
 
   useEffect(() => {
-    setIsClient(true);
-    
-    const instances = getFirebaseInstances();
-    
-    setIsConfigured(instances.isConfigured);
-    setMissingKeys(instances.missingKeys);
-    setAvailableKeys(instances.availableKeys);
-
-    if (instances.isConfigured && instances.auth) {
-      const unsubscribe = onAuthStateChanged(instances.auth, (user) => {
+    const { auth, isConfigured } = getFirebaseInstances();
+    if (isConfigured && auth) {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
         setUser(user);
         setLoading(false);
       });
       return () => unsubscribe();
     } else {
+      // If Firebase is not configured, we are not in a loading state.
       setLoading(false);
     }
   }, []);
 
   const signInWithGoogle = async () => {
+    const { auth, googleProvider, isConfigured } = getFirebaseInstances();
     if (!isConfigured) {
       alert("Firebase is not configured. Please add your project credentials to the .env.local file to enable authentication.");
       return;
     }
-    const { auth, googleProvider } = getFirebaseInstances();
-
-    if (!auth || !googleProvider) {
-      console.error("Firebase auth instances not available during sign-in.");
-      return;
-    }
+    if (!auth || !googleProvider) return;
 
     try {
       await signInWithPopup(auth, googleProvider);
@@ -66,12 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    if (!isConfigured) return;
-    const { auth } = getFirebaseInstances();
-    if (!auth) {
-        console.error("Firebase auth instance not available during sign-out.");
-        return;
-    }
+    const { auth, isConfigured } = getFirebaseInstances();
+    if (!isConfigured || !auth) return;
     try {
       await firebaseSignOut(auth);
     } catch (error) {
@@ -79,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const value = { user, loading, signInWithGoogle, signOut, isConfigured, missingKeys, availableKeys, isClient };
+  const value = { user, loading, signInWithGoogle, signOut };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
