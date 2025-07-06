@@ -1,3 +1,5 @@
+"use client";
+
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
@@ -10,7 +12,11 @@ let googleProvider: GoogleAuthProvider | null = null;
 
 // This function will only be called on the client side, ensuring `process.env` is available.
 export function getFirebaseInstances() {
+  let availableKeys: string[] = [];
   if (typeof window !== 'undefined' && !app) {
+    // Get all available NEXT_PUBLIC_ keys for debugging purposes
+    availableKeys = Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC_'));
+
     // These are required for Firebase to work.
     const requiredEnvVars = [
       'NEXT_PUBLIC_FIREBASE_API_KEY',
@@ -28,7 +34,8 @@ export function getFirebaseInstances() {
         db: null, 
         googleProvider: null, 
         isConfigured: false, 
-        missingKeys: missingEnvVars 
+        missingKeys: missingEnvVars,
+        availableKeys,
       };
     }
 
@@ -47,5 +54,5 @@ export function getFirebaseInstances() {
     googleProvider = new GoogleAuthProvider();
   }
 
-  return { app, auth, db, googleProvider, isConfigured: !!app, missingKeys: [] };
+  return { app, auth, db, googleProvider, isConfigured: !!app, missingKeys: [], availableKeys };
 }

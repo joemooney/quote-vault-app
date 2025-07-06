@@ -16,7 +16,7 @@ import { Skeleton } from "./ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function UserMenu() {
-  const { user, loading, signInWithGoogle, signOut, isConfigured, missingKeys, isClient } = useAuth();
+  const { user, loading, signInWithGoogle, signOut, isConfigured, missingKeys, availableKeys, isClient } = useAuth();
 
   if (!isClient || loading) {
     return (
@@ -47,17 +47,17 @@ export default function UserMenu() {
             </TooltipTrigger>
             <TooltipContent side="right" align="start" className="max-w-xs">
                <p className="font-semibold">Firebase Configuration Required</p>
-               {missingKeys.length > 0 ? (
-                 <div className="mt-2 space-y-2">
-                   <p className="text-muted-foreground">Your `.env` file is missing or has empty values for:</p>
-                   <div className="space-y-1 rounded-md bg-muted p-2 font-mono text-xs text-destructive">
-                     {missingKeys.map(key => <div key={key}>{key}</div>)}
-                   </div>
-                   <p className="text-muted-foreground">Click the "Action Required" card to go to the Firebase console and find these values in your web app's settings.</p>
+               <div className="mt-2 space-y-2">
+                 <p className="text-muted-foreground">The app is missing these required environment variables:</p>
+                 <div className="space-y-1 rounded-md bg-muted p-2 font-mono text-xs text-destructive">
+                   {missingKeys.map(key => <div key={key}>{key}</div>)}
                  </div>
-               ) : (
-                 <p className="text-muted-foreground mt-2">Could not connect to Firebase. Please ensure your credentials in the `.env` file are correct.</p>
-               )}
+                 <p className="text-muted-foreground">For debugging, here are the public keys the app can see:</p>
+                 <div className="space-y-1 rounded-md bg-muted p-2 font-mono text-xs text-foreground">
+                    {availableKeys.length > 0 ? availableKeys.map(key => <div key={key}>{key}</div>) : <div>None found.</div>}
+                 </div>
+                 <p className="text-muted-foreground">Please ensure your `.env` file is correctly formatted and contains all the necessary keys.</p>
+               </div>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

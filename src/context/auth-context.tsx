@@ -13,6 +13,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   isConfigured: boolean;
   missingKeys: string[];
+  availableKeys: string[];
   isClient: boolean;
 }
 
@@ -24,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isClient, setIsClient] = useState(false);
   const [isConfigured, setIsConfigured] = useState(false);
   const [missingKeys, setMissingKeys] = useState<string[]>([]);
+  const [availableKeys, setAvailableKeys] = useState<string[]>([]);
   
   // Store instances in state to ensure they are stable across re-renders
   const [auth, setAuth] = useState<Auth | null>(null);
@@ -37,6 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     setIsConfigured(instances.isConfigured);
     setMissingKeys(instances.missingKeys);
+    setAvailableKeys(instances.availableKeys);
     setAuth(instances.auth);
     setGoogleProvider(instances.googleProvider);
 
@@ -72,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const value = { user, loading, signInWithGoogle, signOut, isConfigured, missingKeys, isClient };
+  const value = { user, loading, signInWithGoogle, signOut, isConfigured, missingKeys, availableKeys, isClient };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
