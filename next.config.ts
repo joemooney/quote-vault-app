@@ -3,23 +3,9 @@ import type {NextConfig} from 'next';
 
 // Manually load environment variables from .env.local.
 // This is a robust workaround for environments where Next.js might not automatically pick up the file.
-const dotenv = require('dotenv');
-const result = dotenv.config({ path: './.env.local' });
-
-if (result.error) {
-  console.error('[Firebase Studio Debug] Error loading .env.local file:', result.error);
-} else {
-  console.log('[Firebase Studio Debug] Successfully loaded .env.local file. Keys found:', Object.keys(result.parsed || {}));
-}
-
-// Log the current working directory to debug .env.local file loading issues.
-console.log(`\n[Firebase Studio Debug] CWD: ${process.cwd()}\n`);
+require('dotenv').config({ path: './.env.local' });
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  experimental: {
-    // Other experimental features can go here
-  },
   webpack: (config) => {
     // This is to suppress a benign warning from the 'handlebars' package, a dependency of genkit.
     // The package uses a deprecated feature not supported by webpack.
@@ -50,11 +36,5 @@ const nextConfig: NextConfig = {
     ],
   },
 };
-
-// --- START DEBUG LOGS ---
-console.log('[Firebase Studio Debug] Reading next.config.ts...');
-console.log('[Firebase Studio Debug] Allowed Origins being configured:', JSON.stringify(nextConfig.allowedDevOrigins, null, 2));
-// --- END DEBUG LOGS ---
-
 
 export default nextConfig;
