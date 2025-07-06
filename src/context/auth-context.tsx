@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import type { User } from 'firebase/auth';
 import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth';
 import { getFirebaseInstances } from '@/lib/firebase';
-import type { Auth, GoogleAuthProvider } from 'firebase/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -26,22 +25,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isConfigured, setIsConfigured] = useState(false);
   const [missingKeys, setMissingKeys] = useState<string[]>([]);
   const [availableKeys, setAvailableKeys] = useState<string[]>([]);
-  
-  // Store instances in state to ensure they are stable across re-renders
-  const [auth, setAuth] = useState<Auth | null>(null);
-  const [googleProvider, setGoogleProvider] = useState<GoogleAuthProvider | null>(null);
 
   useEffect(() => {
     setIsClient(true);
     
-    // getFirebaseInstances is now guaranteed to run only on the client.
     const instances = getFirebaseInstances();
     
     setIsConfigured(instances.isConfigured);
     setMissingKeys(instances.missingKeys);
     setAvailableKeys(instances.availableKeys);
-    setAuth(instances.auth);
-    setGoogleProvider(instances.googleProvider);
 
     if (instances.isConfigured && instances.auth) {
       const unsubscribe = onAuthStateChanged(instances.auth, (user) => {
@@ -55,10 +47,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithGoogle = async () => {
-    if (!isConfigured || !auth || !googleProvider) {
-      alert("Firebase is not configured. Please add your project credentials to the .env file to enable authentication.");
+    if (!isConfigured) {
+      alert("Firebase is not configured. Please add your project credentials to the .env.local file to enable authentication.");
       return;
     }
+    const { auth, googleProvider } = getFirebaseInstances();
+
+    if (!auth || !googleProvider) {
+      console.error("Firebase auth instances not available during sign-in.");
+      return;
+    }
+
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
@@ -67,7 +66,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    if (!isConfigured || !auth) return;
+    if (!isConfigured) return;
+    const { auth } = getFirebaseInstances();
+    if (!auth) {
+        console.error("Firebase auth instance not available during sign-out.");
+        return;
+    }
     try {
       await firebaseSignOut(auth);
     } catch (error) {
