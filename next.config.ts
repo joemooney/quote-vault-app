@@ -1,4 +1,4 @@
-
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config) => {
     // This is to suppress a benign warning from the 'handlebars' package, a dependency of genkit.
