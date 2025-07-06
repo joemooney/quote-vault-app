@@ -1,11 +1,5 @@
 
-import type {NextConfig} from 'next';
-
-// Manually load environment variables from .env.local.
-// This is a robust workaround for environments where Next.js might not automatically pick up the file.
-require('dotenv').config({ path: './.env.local' });
-
-const nextConfig: NextConfig = {
+const nextConfig = {
   webpack: (config) => {
     // This is to suppress a benign warning from the 'handlebars' package, a dependency of genkit.
     // The package uses a deprecated feature not supported by webpack.
